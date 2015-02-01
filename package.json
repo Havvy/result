@@ -1,0 +1,26 @@
+{
+  "name": "r-result",
+  "version": "1.0.0",
+  "description": "Rust's Result in JS",
+  "main": "result.js",
+  "scripts": {
+    "test": "mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Havvy/result.git"
+  },
+  "keywords": [
+    "rust",
+    "result"
+  ],
+  "author": "Ryan Scheel (Havvy)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Havvy/result/issues"
+  },
+  "homepage": "https://github.com/Havvy/result",
+  "devDependencies": {
+    "mocha": "^2.1.0"
+  }
+}
