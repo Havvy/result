@@ -67,7 +67,7 @@ const getPrimeNumberFromUser = function () {
 const doGetPrimeNumberFromUser = function () {
     return getPrimeNumberFromUser()
     .map(function (number) {
-        return format("Indeed! %i is primse!", number);
+        return format("Indeed! %i is prime!", number);
     })
     .unwrap_or_else(function (reason) {
         switch (reason) {
