@@ -110,3 +110,6 @@ for best results, please pass values of the same type as what Rust says.
 We don't have a blessed Option type, so instead of returning one, `.ok()` and `.fail()`
 are instead doing what `Result::unwrap` and `Result::unwrap_err` are doing and throwing
 an error if the value isn't the right type.
+
+In Rust, the Result must be used. Not using a returned Result is a compile time error.
+In JavaScript, we have no way of guaranteeing this, so not using a Result is entirely possible.
