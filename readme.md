@@ -9,7 +9,7 @@ npm install r-result
 See Rust's [Result](http://doc.rust-lang.org/std/result/enum.Result.html).
 
 
-```
+```javascript
 // Using EcmaScript 6 features in this example. ES6 not required to use package.
 // This module exports a single function that asks the user for a prime number,
 // and returns them a string about their input.
