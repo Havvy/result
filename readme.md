@@ -15,7 +15,7 @@ See Rust's [Result](http://doc.rust-lang.org/std/result/enum.Result.html).
 // and returns them a string about their input.
 
 const {Ok, Fail} = require("r-result");
-const {format} = require("util").format;
+const {format} = require("util");
 const {promptUser, alertUser} = require("...");
 
 // Some reasons that we fail.
@@ -113,3 +113,35 @@ an error if the value isn't the right type.
 
 In Rust, the Result must be used. Not using a returned Result is a compile time error.
 In JavaScript, we have no way of guaranteeing this, so not using a Result is entirely possible.
+
+## Rationale and Rant on Error Handling
+
+You might be looking at this, and thinking that this just reimplements error handling,
+and in many ways, this is true. The difference though, is that by being a return value,
+it is made explicitly clear that the function does not always succeed even for all
+valid inputs to the function. This explicitness also means that you are not forcing
+your function caller to use try-catch to capture all of the return values. Try-catch
+is an error handling mechanism that should only be used for actual errors, whether they
+be programmer induced errors or some fundamental assumption actually changed that your
+program cannot handle. This means that most code doesn't have `try`/`catch` in it, since the
+these errors generally cannot be handled except to report them to the user and log them.
+
+Combined with the usage of some `Async<T, E>` value (like promises), and the amount of
+real error handling code you'll write drops dramatically. If you're ever writing
+`if (err) { throw err; }`, you're using a poor abstraction that makes you manually
+propogate errors.
+
+Likewise, just as you should never `throw` instead of `return Fail(...)`, when dealing
+with promises, you should never `reject(...)` when you can `resolve(Fail(...))`. The
+only time you should use `reject` is when you'd use `throw` in synchronous code.
+
+Some programmers actually disagree with this sentiment, trying to conflate `reject` to
+mean both `return Fail(...)` and `throw new Error`, using something like `bluebird`'s
+`OperationalError` for the `Fail` case. The author of this package disagrees with this
+approach because different concerns should be handled differently. Those who disagree
+with the author say that not handling `Fail`ures is an error, and so should be wrapped
+in an error to force the end programmer to deal with it. This does sound like a good
+idea (and you'll notice that in Rust it's a compile time error to not handle a Result),
+but you trade off readability and speed (making a stacktrace is not *cheap*). Should you
+really need to make sure your user does something with failures, making them errors is
+a heavy-handed approach, and it does work.
