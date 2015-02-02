@@ -27,6 +27,7 @@ const nonInt = Symbol("Not an Integer");
 const zero = Symbol("Zero");
 
 const getNumberFromUser = function (requestString) {
+    // Assume blocking prompt. Don't want to complicate with promises.
     const userInput = promptUser(requestString);
 
     const number = Number(userInput);
@@ -65,7 +66,7 @@ const getPrimeNumberFromUser = function () {
 };
 
 const doGetPrimeNumberFromUser = function () {
-    return getPrimeNumberFromUser()
+    var reply = getPrimeNumberFromUser()
     .map(function (number) {
         return format("Indeed! %i is prime!", number);
     })
@@ -78,7 +79,10 @@ const doGetPrimeNumberFromUser = function () {
             case nonPrime: return "Sorry, but that number isn't prime.",
             default:       throw new Error(format("Unhandled failure reason: %s", reason))
         }
-    });
+    })
+    .ok();
+    
+    alertUser(reply);
 };
 
 module.exports = doGetPrimeNumberFromUser;
