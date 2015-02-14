@@ -66,7 +66,7 @@ const getPrimeNumberFromUser = function () {
 };
 
 const doGetPrimeNumberFromUser = function () {
-    var reply = getPrimeNumberFromUser()
+    const reply = getPrimeNumberFromUser()
     .map(function (number) {
         return format("Indeed! %i is prime!", number);
     })
@@ -79,8 +79,7 @@ const doGetPrimeNumberFromUser = function () {
             case nonPrime: return "Sorry, but that number isn't prime.",
             default:       throw new Error(format("Unhandled failure reason: %s", reason))
         }
-    })
-    .ok();
+    });
     
     alertUser(reply);
 };
