@@ -1,6 +1,6 @@
 {
   "name": "r-result",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Rust's Result in JS",
   "main": "result.js",
   "scripts": {
