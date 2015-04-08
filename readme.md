@@ -110,3 +110,15 @@ for best results, please pass values of the same type as what Rust says.
 We don't have a blessed Option type, so instead of returning one, `.ok()` and `.fail()`
 are instead doing what `Result::unwrap` and `Result::unwrap_err` are doing and throwing
 an error if the value isn't the right type.
+
+## Functional Variants
+
+Every method can be called as a function on the module.
+
+```javascript
+var Result = require('r-result');
+var sampleResult = Result.Ok(true);
+Result.map(sampleResult, function (value) {
+    assert(value === true);
+});
+```

@@ -135,3 +135,16 @@ module.exports = {
     Ok: Ok,
     Fail: Fail,
 };
+
+const methodToFunction = function (method) {
+    return function () {
+        var context = arguments[0];
+        var args = Array.prototype.slice.call(arguments, 1);
+        method.apply(context, args);
+    };
+};
+
+Object.keys(methods).forEach(function (key) {
+    var method = methods[key];
+    module.exports[key] = methodToFunction(method);
+});

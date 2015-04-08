@@ -5,9 +5,9 @@ const assert = require("assert");
 const inspect = require("util").inspect;
 const format = require("util").format;
 
-const result = require("./result");
-const Ok = result.Ok;
-const Fail = result.Fail;
+const Result = require("./result");
+const Ok = Result.Ok;
+const Fail = Result.Fail;
 
 describe("Result", function () {
     it("constructs Ok values", function () {
@@ -152,4 +152,20 @@ describe("Result", function () {
         var result = Fail("x");
         assert(result.andThen(function (v) { assert(false); }) === result);
     });
+
+    // Even though I'm testing one function, because
+    // all functions are added via a loop, that's all
+    // that really needs to be tested.
+    it("has methods usable as functions", function () {
+        var result = Ok(true);
+        var flag = false;
+
+        Result.map(result, function (value) {
+            console.log("blah");
+            assert(value === true);
+            flag = true;
+        });
+
+        assert(flag === true);
+    })
 });
