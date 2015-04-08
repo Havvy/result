@@ -1,3 +1,5 @@
+![NPM Downloads](https://img.shields.io/npm/dm/r-result.svg) ![Version](https://img.shields.io/npm/v/r-result.svg) ![ISC Licensed](https://img.shields.io/npm/l/r-result.svg) ![Github Issue Count](https://img.shields.io/github/issues/havvy/result.svg) ![Github Stars](https://img.shields.io/github/stars/Havvy/result.svg)
+
 Rust's [Result](http://doc.rust-lang.org/std/result/enum.Result.html) Implemented in JS.
 
 ```
