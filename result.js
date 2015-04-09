@@ -140,7 +140,7 @@ const methodToFunction = function (method) {
     return function () {
         var context = arguments[0];
         var args = Array.prototype.slice.call(arguments, 1);
-        method.apply(context, args);
+        return method.apply(context, args);
     };
 };
 

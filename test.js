@@ -153,9 +153,6 @@ describe("Result", function () {
         assert(result.andThen(function (v) { assert(false); }) === result);
     });
 
-    // Even though I'm testing one function, because
-    // all functions are added via a loop, that's all
-    // that really needs to be tested.
     it("has methods usable as functions", function () {
         var result = Ok(true);
         var flag = false;
@@ -167,5 +164,9 @@ describe("Result", function () {
         });
 
         assert(flag === true);
-    })
+    });
+
+    it("has methods usable as functions that return", function () {
+        assert(Result.ok(Ok(true)) === true);
+    });
 });
