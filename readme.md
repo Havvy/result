@@ -121,15 +121,54 @@ In JavaScript, we have no way of guaranteeing this, so not using a Result is ent
 
 ## Functional Variants
 
-Every method can be called as a function on the module.
+Every method has a function that takes `this` as the first parameter as a function on the module.
+
+This lets you write in an Erlang/Elixir style or just pass things to other functions.
 
 ```javascript
-var Result = require('r-result');
-var sampleResult = Result.Ok(true);
+const Result = require('r-result');
+const sampleResult = Result.Ok(true);
 Result.map(sampleResult, function (value) {
     assert(value === true);
 });
 ```
+
+```javascript
+const Result = require("r-result");
+const Ok = Result.Ok;
+const Fail = Result.Fail;
+
+// Unrelated: You can totes have a Result<undefined, string> if there's no good value for Ok.
+const someResults = [Ok(), Ok(), Ok(), Fail("unexpected spanish inquisition"), Ok()];
+const resultOfSomeResults = someResults.reduce(Result.and);
+```
+
+## API
+
+### Syntax
+
+* `::` means 'on the prototype' of the value.
+* `<>` means generic parameters. `T` is used for an Ok value. `F` is used for a Failure. `T'`, `F'` are for a second Ok/Failure type, though they may (and in most cases, should be) the same value as the non-prime variant. `_` means "any type" or "no type", since it can be anything without issue.
+* `[T, 0...1]` means an array of type T with a length of either 0 or 1.
+* `|` means either the type on the left or the type on the right.
+
+### API
+
+* Result.Ok(value: T) -> Result<T, _>
+* Result.Fail(value: F) -> Result<_, F>
+* Result<T, F>::`ok`() -> T | throw TypeError
+* Result<T, F>::`fail`() -> F | throw TypeError
+* Result<T, F>::`isOk`() -> Boolean
+* Result<T, F>::`isFail`() -> Boolean
+* Result<T, F>::`map`(mapper: function (value: T) -> T') -> Result<T', F>
+* Result<T, F>::`mapFail`(mapper: function (failure: F) -> F' -> Result<T, F'>
+* Result<T, F>::`and`(otherResult: Result<T', F'>) -> Result<T', F | F'>
+* Result<T, F>::`or`(otherResult: Result<T', F'>) -> Result<T | T', F'>
+* Result<T, F>::`andThen`(monadic_mapper: function (value: T) -> Result<T', F'>) -> Result<T', F | F'>
+* Result<T, F>::`orElse`(monadic_mapper: function (failure: F) -> Result<T', F'>) -> Result<T | T', F'>
+* Result<T, F>::`toArray`() -> [T; 0...1]
+* Result<T, F>::`unwrapOr`(defaultValue: T') -> T | T'
+* Result<T, F>::`unwrapOrElse`(defaultValueMaker: function (failure: F) -> T') -> T | T'
 
 ## Rationale and Rant on Error Handling
 
