@@ -114,10 +114,14 @@ for best results, please pass values of the same type as what Rust says.
 
 We don't have a blessed Option type, so instead of returning one, `.ok()` and `.fail()`
 are instead doing what `Result::unwrap` and `Result::unwrap_err` are doing and throwing
-an error if the value isn't the right type.
+an error if the value isn't the right type. By default, they report a generic error message,
+but you can give a specific error message as the optional argument.
 
 In Rust, the Result must be used. Not using a returned Result is a compile time error.
 In JavaScript, we have no way of guaranteeing this, so not using a Result is entirely possible.
+
+Because JavaScript doesn't have a `match` expression or even a `match` statement,
+we provide a `match` method that takes an object with functions `Ok` and `Fail`.
 
 ## Functional Variants
 
@@ -157,7 +161,9 @@ const resultOfSomeResults = someResults.reduce(Result.and);
 * Result.Ok(value: T) -> Result<T, _>
 * Result.Fail(value: F) -> Result<_, F>
 * Result<T, F>::`ok`() -> T | throw TypeError
+* Result<T, F>::`ok`(errorMessage: String) -> T | throw TypeError
 * Result<T, F>::`fail`() -> F | throw TypeError
+* Result<T, F>::`fail`(errorMessage: String) -> F | throw TypeError
 * Result<T, F>::`isOk`() -> Boolean
 * Result<T, F>::`isFail`() -> Boolean
 * Result<T, F>::`map`(mapper: function (value: T) -> T') -> Result<T', F>
@@ -169,6 +175,7 @@ const resultOfSomeResults = someResults.reduce(Result.and);
 * Result<T, F>::`toArray`() -> [T; 0...1]
 * Result<T, F>::`unwrapOr`(defaultValue: T') -> T | T'
 * Result<T, F>::`unwrapOrElse`(defaultValueMaker: function (failure: F) -> T') -> T | T'
+* Result<T, F>::`match`({Ok: function (value: T) -> void, Fail: function (failure: F) -> void});
 
 ## Rationale and Rant on Error Handling
 

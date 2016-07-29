@@ -13,17 +13,25 @@ const Fail = function (f) {
 };
 
 const methods = {
-    ok: function (/*this*/) {
+    ok: function (/*this,*/ errorMessage) {
         if (this.is_ok) {
             return this.value;
         } else {
-            throw new TypeError("Attempted to unwrap Ok(t) but got Fail(f) instead.");
+            if (errorMessage) {
+                throw new TypeError(errorMessage);
+            } else {
+                throw new TypeError("Attempted to unwrap Ok(t) but got Fail(f) instead.");
+            }
         }
     },
 
-    fail: function (/*this*/) {
+    fail: function (/*this,*/ errorMessage) {
         if (this.is_ok) {
-            throw new TypeError("Attempted to unwrap Fail(f) but got Ok(t) instead.");
+            if (errorMessage) {
+                throw new TypeError(errorMessage);
+            } else {
+                throw new TypeError("Attempted to unwrap Fail(f) but got Ok(t) instead.");
+            }
         } else {
             return this.value;
         }
@@ -127,6 +135,15 @@ const methods = {
             return this.value;
         } else {
             return defaultFn(this.value);
+        }
+    },
+
+    // (Result<T, F>, {Ok: function (value: T) -> void, Fail: function (failure: F) -> void}) -> void
+    match: function (/*this,*/ matchBlock) {
+        if (this.is_ok) {
+            return matchBlock.Ok(this.value);
+        } else {
+            return matchBlock.Fail(this.value);
         }
     }
 };

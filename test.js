@@ -158,7 +158,6 @@ describe("Result", function () {
         var flag = false;
 
         Result.map(result, function (value) {
-            console.log("blah");
             assert(value === true);
             flag = true;
         });
