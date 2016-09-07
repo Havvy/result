@@ -1,6 +1,6 @@
 ![Travis Status](https://img.shields.io/travis/Havvy/result.svg) ![NPM Downloads](https://img.shields.io/npm/dm/r-result.svg) ![Version](https://img.shields.io/npm/v/r-result.svg) ![ISC Licensed](https://img.shields.io/npm/l/r-result.svg) ![Github Issue Count](https://img.shields.io/github/issues/havvy/result.svg) ![Github Stars](https://img.shields.io/github/stars/Havvy/result.svg)
 
-Rust's [Result](http://doc.rust-lang.org/std/result/enum.Result.html) Implemented in JS.
+Rust's [Result](http://doc.rust-lang.org/std/result/enum.Result.html) implemented in JS.
 
 ```
 npm install r-result
@@ -10,6 +10,9 @@ npm install r-result
 
 See Rust's [Result](http://doc.rust-lang.org/std/result/enum.Result.html).
 
+## Example
+
+For a real example, see [tennu-factoids](https://github.com/Tennu/tennu-factoids/blob/master/plugin.js).
 
 ```javascript
 // Using EcmaScript 6 features in this example. ES6 not required to use package.
@@ -60,7 +63,7 @@ const getPrimeNumberFromUser = function () {
     .andThen(function (number) {
         if (isPrime(number)) {
             return Ok(number);
-            // You could also just `return this`.
+            // You could also just `return this` since you're not transforming the value.
         } else {
             return Fail(nonPrime);
         }
@@ -68,18 +71,20 @@ const getPrimeNumberFromUser = function () {
 };
 
 const doGetPrimeNumberFromUser = function () {
-    const reply = getPrimeNumberFromUser()
-    .map(function (number) {
-        return format("Indeed! %i is prime!", number);
-    })
-    .unwrap_or_else(function (reason) {
-        switch (reason) {
-            case nan:      return "That wasn't a number.",
-            case inf:      return "Sneaky user, trying to throw me into an infinite loop with Infinity.",
-            case nonInt:   return "Sneaky user, trying to give me a rational number instead of an integer.",
-            case neg       return "Sneaky user, trying to give me a negative number...",
-            case nonPrime: return "Sorry, but that number isn't prime.",
-            default:       throw new Error(format("Unhandled failure reason: %s", reason))
+    const reply = getPrimeNumberFromUser().match({
+        Ok(number) { 
+            return `Indeed! ${number} is prime!`;
+        },
+
+        Fail(reason) {
+            switch (reason) {
+                case nan:      return "That wasn't a number.",
+                case inf:      return "Sneaky user, trying to throw me into an infinite loop with Infinity.",
+                case nonInt:   return "Sneaky user, trying to give me a rational number instead of an integer.",
+                case neg       return "Sneaky user, trying to give me a negative number...",
+                case nonPrime: return "Sorry, but that number isn't prime.",
+                default:       throw new Error(`Unhandled failure reason: ${reason}`)
+            }
         }
     });
     
@@ -94,8 +99,8 @@ module.exports = doGetPrimeNumberFromUser;
 Obviously, JavaScript is a different language than Rust. Differences in idiomatic code
 and type systems means there will be differences in the code and API.
 
-We already have Errors in JavaScript, which from this package's author's perspective,
-should only be used for programmer errors. This is no good, so in this package, we use Fail.
+We already have Errors in JavaScript. This means we can't use the `Err` name
+and so instead use the name `Fail`.
 
 Because idiomatic JS uses camelCase instead of lower_case, all method names have been
 translates to camelCase.
@@ -104,7 +109,7 @@ Because we cannot get a slice, but we can get an array, `as_slice()` has been
 changed to `toArray()`. Not sure if it'll actually be helpful though, unless
 you flatmap over an array of results. But it's there for completeness.
 
-The Rust type specific methods (e.g. `as_mut_slice`) are obviously not present.
+The Rust reference type specific methods (e.g. `as_mut_slice`) are obviously not present.
 
 The methods `and`, `or`, `andThen`, `orElse` are less strict about the types of the
 parameters they take. We do not check to make sure you called us with the correct
@@ -122,6 +127,14 @@ In JavaScript, we have no way of guaranteeing this, so not using a Result is ent
 
 Because JavaScript doesn't have a `match` expression or even a `match` statement,
 we provide a `match` method that takes an object with functions `Ok` and `Fail`.
+
+The `Debug` trait doesn't exist in JS, so there's a `debug` method directly in the
+implementation.
+
+There's also `debugOk` and `debugFail` methods that inspect the inner
+values if the result matches that variant or does nothing otherwise, and
+then returns the result. These don't have an analog to Rust's standard library,
+but are useful for e.g. `assert(result.debugFail(logfn).isOk());`
 
 ## Functional Variants
 
@@ -155,6 +168,7 @@ const resultOfSomeResults = someResults.reduce(Result.and);
 * `<>` means generic parameters. `T` is used for an Ok value. `F` is used for a Failure. `T'`, `F'` are for a second Ok/Failure type, though they may (and in most cases, should be) the same value as the non-prime variant. `_` means "any type" or "no type", since it can be anything without issue.
 * `[T, 0...1]` means an array of type T with a length of either 0 or 1.
 * `|` means either the type on the left or the type on the right.
+* InspectOpts is the [options object](https://nodejs.org/api/util.html#util_util_inspect_object_options) you pass to `util.inspect`.
 
 ### API
 
@@ -175,21 +189,29 @@ const resultOfSomeResults = someResults.reduce(Result.and);
 * Result<T, F>::`toArray`() -> [T; 0...1]
 * Result<T, F>::`unwrapOr`(defaultValue: T') -> T | T'
 * Result<T, F>::`unwrapOrElse`(defaultValueMaker: function (failure: F) -> T') -> T | T'
-* Result<T, F>::`match`({Ok: function (value: T) -> void, Fail: function (failure: F) -> void});
+* Result<T, F>::`match`({Ok: Fn(value: T) -> void, Fail: Fn(failure: F) -> void}) -> void
+* Result<T, F>::`debug`(logfn: Fn(debugString: String) -> void) -> void
+* Result<T, F>::`debug`(logfn: Fn(debugString: String, inspectOpts: InspectOpts)) -> void
+* Result<T, F>::`debugOk`(logfn: Fn(debugString: String) -> void) -> void
+* Result<T, F>::`debugOk`(logfn: Fn(debugString: String, inspectOpts: InspectOpts)) -> void
+* Result<T, F>::`debugFail`(logfn: Fn(debugString: String) -> void) -> void
+* Result<T, F>::`debugFail`(logfn: Fn(debugString: String, inspectOpts: InspectOpts)) -> void
 
 ## Rationale and Rant on Error Handling
 
+Author: Havvy
+
 You might be looking at this, and thinking that this just reimplements error handling,
-and in many ways, this is true. The difference though, is that by being a return value,
+and yes, this is true. The difference though, is that by being a return value
 it is made explicitly clear that the function does not always succeed even for all
 valid inputs to the function. This explicitness also means that you are not forcing
 your function caller to use try-catch to capture all of the return values. Try-catch
-is an error handling mechanism that should only be used for actual errors, whether they
+becomes an error handling mechanism that should only be used for actual errors, whether they
 be programmer induced errors or some fundamental assumption actually changed that your
 program cannot handle. This means that most code doesn't have `try`/`catch` in it, since the
 these errors generally cannot be handled except to report them to the user and log them.
 
-Combined with the usage of some `Async<T, E>` value (like promises), and the amount of
+Combined with the usage of some `Future<T, E>` value (like promises), and the amount of
 real error handling code you'll write drops dramatically. If you're ever writing
 `if (err) { throw err; }`, you're using a poor abstraction that makes you manually
 propogate errors.

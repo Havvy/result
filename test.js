@@ -153,6 +153,86 @@ describe("Result", function () {
         assert(result.andThen(function (v) { assert(false); }) === result);
     });
 
+    it("can be 'matched' against", function () {
+        var ok = Ok("x");
+        var okCalled = false;
+
+        ok.match({
+            Ok: function (x) {
+                assert(x === "x");
+                okCalled = true;
+            },
+
+            Fail: function (x) {
+                assert(false);
+            }
+        });
+
+        assert(okCalled);
+
+        var fail = Fail("x");
+        var failCalled = false;
+
+        fail.match({
+            Ok: function (x) {
+                assert(false);
+            },
+
+            Fail: function (x) {
+                assert(x === "x");
+                failCalled = true;
+            }
+        });
+
+        assert(failCalled);
+    });
+
+    describe("can print debug strings", function () {
+        const noPreviousLoggedString = "No previous logged string.";
+        var logfn, lastLoggedString;
+
+        beforeEach(function () {
+            logfn = function (string) {
+                lastLoggedString = string;
+            };
+
+            lastLoggedString = noPreviousLoggedString;
+        });
+
+        it("with debug", function () {
+            var ok = Ok("x");
+            ok.debug(logfn);
+
+            var fail = Fail("y");
+            fail.debug(logfn);
+            assert(lastLoggedString === "Fail('y')");
+        });
+
+        it("with debugOk with Ok('x')", function () {
+            var ok = Ok("x");
+            ok.debugOk(logfn);
+            assert(lastLoggedString === "'x'");
+        });
+
+        it("with debugOk with Fail('x')", function () {
+            var fail = Fail("x");
+            fail.debugOk(logfn);
+            assert(lastLoggedString === noPreviousLoggedString);
+        });
+
+        it("with debugFail with Ok('x')", function () {
+            var ok = Ok("x");
+            ok.debugFail(logfn);
+            assert(lastLoggedString === noPreviousLoggedString);
+        });
+
+        it("with debugFail with Fail('x')", function () {
+            var fail = Fail("x");
+            fail.debugFail(logfn);
+            assert(lastLoggedString === "'x'");
+        });
+    });
+
     it("has methods usable as functions", function () {
         var result = Ok(true);
         var flag = false;

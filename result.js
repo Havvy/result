@@ -1,3 +1,5 @@
+const inspect = require("util").inspect;
+
 const Ok = function (t) {
     const Result = Object.create(methods);
     Result.is_ok = true;
@@ -138,13 +140,40 @@ const methods = {
         }
     },
 
-    // (Result<T, F>, {Ok: function (value: T) -> void, Fail: function (failure: F) -> void}) -> void
+    // Fn(Result<T, F>, {Ok: function (value: T) -> void, Fail: function (failure: F) -> void}) -> void
     match: function (/*this,*/ matchBlock) {
         if (this.is_ok) {
             return matchBlock.Ok(this.value);
         } else {
             return matchBlock.Fail(this.value);
         }
+    },
+
+    // Fn(Result<T, F>, Fn(String) -> void, InspectOpts)
+    debug: function (/*this,*/ logfn, inspectOpts) {
+        if (this.is_ok) {
+            logfn("Ok(" + inspect(this.value, inspectOpts) + ")");
+        } else {
+            logfn("Fail(" + inspect(this.value, inspectOpts) + ")");
+        }
+    },
+
+    // Fn(Result<T, F>, Fn(String) -> void, InspectOpts)
+    debugOk: function(/*this,*/ logfn, inspectOpts) {
+        if (this.is_ok) {
+            logfn(inspect(this.value, inspectOpts));
+        }
+
+        return this;
+    },
+
+    // Fn(Result<T, F>, Fn(String) -> void, InspectOpts)
+    debugFail: function(/*this,*/ logfn, inspectOpts) { 
+        if (!this.is_ok) {
+            logfn(inspect(this.value, inspectOpts));
+        }
+
+        return this;
     }
 };
 
