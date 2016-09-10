@@ -149,13 +149,27 @@ const methods = {
         }
     },
 
+    /// https://nodejs.org/api/util.html#util_custom_inspect_function_on_objects
+    // Fn(Result<T, F>, Number, InspectOpts) -> String
+    inspect: function (/*this,*/ depth, opts) {
+        var tag = this.is_ok ? "Ok" : "Fail";
+
+        if (depth < 0) {
+            return opts.stylize("[" + tag + "]", "boolean");
+        }
+
+        var recurseOpts = {};
+        Object.keys(opts).forEach(function (key) {
+            recurseOpts[key] = opts[key];
+        });
+        recurseOpts.depth = opts.depth === null ? null : opts.depth - 1;
+
+        return opts.stylize(tag, "boolean") + "( " + inspect(this.value, recurseOpts) + " )";
+    },
+
     // Fn(Result<T, F>, Fn(String) -> void, InspectOpts)
     debug: function (/*this,*/ logfn, inspectOpts) {
-        if (this.is_ok) {
-            logfn("Ok(" + inspect(this.value, inspectOpts) + ")");
-        } else {
-            logfn("Fail(" + inspect(this.value, inspectOpts) + ")");
-        }
+        logfn(inspect(this, inspectOpts));
     },
 
     // Fn(Result<T, F>, Fn(String) -> void, InspectOpts)

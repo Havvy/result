@@ -199,13 +199,18 @@ describe("Result", function () {
             lastLoggedString = noPreviousLoggedString;
         });
 
+        it("with inspect", function () {
+            assert(inspect(Ok(true)) === "Ok( true )");
+        });
+
         it("with debug", function () {
             var ok = Ok("x");
             ok.debug(logfn);
+            assert(lastLoggedString === "Ok( 'x' )");
 
             var fail = Fail("y");
             fail.debug(logfn);
-            assert(lastLoggedString === "Fail('y')");
+            assert(lastLoggedString === "Fail( 'y' )");
         });
 
         it("with debugOk with Ok('x')", function () {
