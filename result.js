@@ -205,6 +205,11 @@ const methodToFunction = function (method) {
 };
 
 Object.keys(methods).forEach(function (key) {
+    // NOTE(bbqsrc): Breaks require in repl
+    if (key === "inspect") {
+      return;
+    }
+
     var method = methods[key];
     module.exports[key] = methodToFunction(method);
 });
