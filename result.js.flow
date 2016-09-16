@@ -1,0 +1,59 @@
+/* @flow */
+
+type InspectOpts = {
+  showHidden: boolean;
+  depth: number;
+  colors: boolean;
+  customInspect: boolean;
+  showProxy: boolean;
+  maxArrayLength: number;
+  breakLength: number;
+}
+
+type MatchBlock<T, F> = {
+  Ok(value: T): void;
+  Fail(failure: F): void;
+}
+
+export type Result<T, F> = {
+  ok(errorMessage?: string): T;
+  fail(errorMessage?: string): F;
+  isOk(): boolean;
+  isFail(): boolean;
+  map(f: (value: T) => T): Result<T, F>;
+  mapFail(f: (failure: F) => F): Result<T, F>;
+  and<A>(rhsResult: A): Result<T, F> | A;
+  or<A>(rhsResult: A): Result<T, F> | A;
+  andThen<A>(f: (value: T) => A): Result<T, F> | A;
+  orElse<A>(f: (failure: F) => A): Result<T, F> | A;
+  toArray(): [T];
+  unwrapOr<A>(defaultValue: A): T | A;
+  unwrapOrElse<A>(defaultFn: (failure: F) => A): T | A;
+  match(block: MatchBlock<T, F>): void;
+  inspect(depth: number, opts?: InspectOpts): string;
+  debug(logfn: (string: string) => void, opts?: InspectOpts): void;
+  debugOk(logfn: (string: string) => void, opts?: InspectOpts): void;
+  debugFail(logfn: (string: string) => void, opts?: InspectOpts): void;
+}
+
+declare export function ok<T, F>(result: Result<T, F>, errorMessage?: string): T;
+declare export function fail<T, F>(result: Result<T, F>, errorMessage?: string): F;
+declare export function isOk<T, F>(result: Result<T, F>): boolean;
+declare export function isFail<T, F>(result: Result<T, F>): boolean;
+declare export function map<T, F>(result: Result<T, F>, f: (value: T) => T): Result<T, F>;
+declare export function mapFail<T, F>(result: Result<T, F>, f: (failure: F) => F): Result<T, F>;
+declare export function and<A, T, F>(result: Result<T, F>, rhsResult: A): Result<T, F> | A;
+declare export function or<A, T, F>(result: Result<T, F>, rhsResult: A): Result<T, F> | A;
+declare export function andThen<A, T, F>(result: Result<T, F>, f: (value: T) => A): Result<T, F> | A;
+declare export function orElse<A, T, F>(result: Result<T, F>, f: (failure: F) => A): Result<T, F> | A;
+declare export function toArray<T, F>(result: Result<T, F>): [T];
+declare export function unwrapOr<A, T, F>(result: Result<T, F>, defaultValue: A): T | A;
+declare export function unwrapOrElse<A, T, F>(result: Result<T, F>, defaultFn: (failure: F) => A): T | A;
+declare export function match<T, F>(result: Result<T, F>, block: MatchBlock<T, F>): void;
+declare export function inspect<T, F>(result: Result<T, F>, depth: number, opts?: InspectOpts): string;
+declare export function debug<T, F>(result: Result<T, F>, logfn: (string: string) => void, opts: ?InspectOpts): void;
+declare export function debugOk<T, F>(result: Result<T, F>, logfn: (string: string) => void, opts: ?InspectOpts): void;
+declare export function debugFail<T, F>(result: Result<T, F>, logfn: (string: string) => void, opts: ?InspectOpts): void;
+
+declare export function Ok<T, F>(t: T): Result<T, F>
+declare export function Fail<T, F>(f: F): Result<T, F>
