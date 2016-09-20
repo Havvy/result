@@ -170,6 +170,7 @@ const methods = {
     // Fn(Result<T, F>, Fn(String) -> void, InspectOpts)
     debug: function (/*this,*/ logfn, inspectOpts) {
         logfn(inspect(this, inspectOpts));
+        return this;
     },
 
     // Fn(Result<T, F>, Fn(String) -> void, InspectOpts)
