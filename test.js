@@ -5,6 +5,9 @@ const assert = require("assert");
 const inspect = require("util").inspect;
 const format = require("util").format;
 
+const debug = Boolean(false || process.env.VERBOSE);
+const logfn = debug ? console.log.bind(console) : function () {};
+
 const Result = require("./result");
 const Ok = Result.Ok;
 const Fail = Result.Fail;
@@ -187,6 +190,7 @@ describe("Result", function () {
         assert(failCalled);
     });
 
+    const outerLogfn = logfn;
     describe("can print debug strings", function () {
         const noPreviousLoggedString = "No previous logged string.";
         var logfn, lastLoggedString;
@@ -194,6 +198,7 @@ describe("Result", function () {
         beforeEach(function () {
             logfn = function (string) {
                 lastLoggedString = string;
+                outerLogfn(string);
             };
 
             lastLoggedString = noPreviousLoggedString;
@@ -212,6 +217,27 @@ describe("Result", function () {
             fail.debug(logfn);
             assert(lastLoggedString === "Fail( 'y' )");
         });
+
+        it("with debug with a long inner value", function () {
+            var bigObject = {
+                first: "This is a really long line, eh?",
+                second: "We all need to test details like this when making inspect functions."
+            };
+
+            var ok = Ok(bigObject);
+            ok.debug(logfn);
+            assert(lastLoggedString === [
+                "Ok( { first: 'This is a really long line, eh?',",
+                "      second: 'We all need to test details like this when making inspect functions.' } )"
+            ].join("\n"));
+
+            var fail = Fail(bigObject);
+            fail.debug(logfn);
+            assert(lastLoggedString === [
+                "Fail( { first: 'This is a really long line, eh?',",
+                "        second: 'We all need to test details like this when making inspect functions.' } )"
+            ].join("\n"))
+        })
 
         it("with debugOk with Ok('x')", function () {
             var ok = Ok("x");

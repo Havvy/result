@@ -153,6 +153,7 @@ const methods = {
     // Fn(Result<T, F>, Number, InspectOpts) -> String
     inspect: function (/*this,*/ depth, opts) {
         var tag = this.is_ok ? "Ok" : "Fail";
+        var padding = this.is_ok ? "    " : "      ";
 
         if (depth < 0) {
             return opts.stylize("[" + tag + "]", "boolean");
@@ -164,7 +165,9 @@ const methods = {
         });
         recurseOpts.depth = opts.depth === null ? null : opts.depth - 1;
 
-        return opts.stylize(tag, "boolean") + "( " + inspect(this.value, recurseOpts) + " )";
+        const inner = inspect(this.value, recurseOpts).replace(/\n/g, "\n" + padding);
+
+        return opts.stylize(tag, "boolean") + "( " + inner + " )";
     },
 
     // Fn(Result<T, F>, Fn(String) -> void, InspectOpts)
